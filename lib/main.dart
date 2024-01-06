@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-//import 'AuthenticationScreen.dart';
+import 'add_transaction_page.dart';
+import 'transaction_list_page.dart';
+import 'budget_overview_page.dart';
 import 'splashScreen.dart';
 import 'loginPage.dart';
 import 'signup.dart';
 import 'home.dart';
-//import 'googlesigninpage.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,6 +37,9 @@ class MyApp extends StatelessWidget {
         '/login': (context) => LoginPage(),
         '/register': (context) => SignUpPage(),
         '/home': (context) => HomePage(),
+        '/add_transaction': (context) => AddTransactionPage(),
+        '/transaction_list': (context) => TransactionListPage(),
+        '/budget_overview': (context) => BudgetOverviewPage(),
       },
     );
   }

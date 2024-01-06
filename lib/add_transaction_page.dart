@@ -1,0 +1,104 @@
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+class AddTransactionPage extends StatefulWidget {
+  @override
+  _AddTransactionPageState createState() => _AddTransactionPageState();
+}
+
+class _AddTransactionPageState extends State<AddTransactionPage> {
+  final TextEditingController amountController = TextEditingController();
+  final TextEditingController categoryController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
+
+  // Define options for the transaction type dropdown
+  final List<String> transactionTypes = ['Expense', 'Income'];
+  String selectedTransactionType = 'Expense';
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Add Transaction'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextField(
+              controller: amountController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(labelText: 'Amount'),
+            ),
+            SizedBox(height: 16),
+            DropdownButtonFormField<String>(
+              value: selectedTransactionType,
+              onChanged: (value) {
+                setState(() {
+                  selectedTransactionType = value!;
+                });
+              },
+              items: transactionTypes.map((type) {
+                return DropdownMenuItem<String>(
+                  value: type,
+                  child: Text(type),
+                );
+              }).toList(),
+              decoration: InputDecoration(labelText: 'Transaction Type'),
+            ),
+            SizedBox(height: 16),
+            TextField(
+              controller: categoryController,
+              decoration: InputDecoration(labelText: 'Category'),
+            ),
+            SizedBox(height: 16),
+            TextField(
+              controller: descriptionController,
+              decoration: InputDecoration(labelText: 'Description'),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                saveTransaction();
+              },
+              child: Text('Submit Transaction'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void saveTransaction() async {
+    // Extract data from controllers
+    final double amount = double.parse(amountController.text);
+    final String transactionType = selectedTransactionType;
+    final String category = categoryController.text;
+    final String description = descriptionController.text;
+
+    // Reference to the 'transactions' collection
+    final CollectionReference transactions =
+        FirebaseFirestore.instance.collection('transactions');
+
+    try {
+      // Add a new document with a generated id
+      await transactions.add({
+        'amount': amount,
+        'transactionType': transactionType,
+        'category': category,
+        'description': description,
+        'date': DateTime.now(),
+      });
+
+      // Success message (you can replace this with your own UI feedback)
+      print('Transaction saved successfully!');
+    } catch (e) {
+      // Handle errors (you can replace this with your own error handling)
+      print('Error saving transaction: $e');
+    }
+
+    // After saving, navigate back to the home page
+    Navigator.pop(context);
+  }
+}
