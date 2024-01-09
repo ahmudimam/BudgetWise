@@ -1,17 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
+import './firebaseServices.dart';
 
 class TransactionListPage extends StatelessWidget {
+  final String? uid = FirebaseAuthService().getCurrentUserUid();
   @override
   Widget build(BuildContext context) {
+    if (uid == null) {
+      // If the user is not logged in, you can handle it accordingly
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Transaction List'),
+          backgroundColor: Colors.blue,
+        ),
+        body: Center(
+          child: Text('User not logged in'),
+        ),
+      );
+    }
     return Scaffold(
       appBar: AppBar(
         title: Text('Transaction List'),
         backgroundColor: Colors.blue,
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream:
-            FirebaseFirestore.instance.collection('transactions').snapshots(),
+        stream: FirebaseFirestore.instance
+            .collection('users')
+            .doc(uid)
+            .collection('transactions')
+            .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(
@@ -32,6 +50,10 @@ class TransactionListPage extends StatelessWidget {
             itemBuilder: (context, index) {
               var transaction =
                   transactions[index].data() as Map<String, dynamic>;
+              // Format the date
+              String formattedDate = DateFormat.yMd()
+                  .add_jm()
+                  .format(transaction['date'].toDate());
 
               return Card(
                 elevation: 3,
@@ -44,7 +66,7 @@ class TransactionListPage extends StatelessWidget {
                       Text('Type: ${transaction['transactionType']}'),
                       Text('Category: ${transaction['category']}'),
                       Text('Description: ${transaction['description']}'),
-                      Text('Date: ${transaction['date']}'),
+                      Text('Date: $formattedDate'),
                     ],
                   ),
                   trailing: Row(
@@ -53,23 +75,28 @@ class TransactionListPage extends StatelessWidget {
                       IconButton(
                         icon: Icon(Icons.edit),
                         onPressed: () {
-                          // Implement the edit functionality here
-                          // For example, you can navigate to an edit screen
-                          // Navigator.pushNamed(context, '/edit_transaction', arguments: transaction);
+                          Navigator.pushNamed(
+                            context,
+                            '/edit_transaction',
+                            arguments: {
+                              'id': transaction['id'],
+                              'amount': transaction['amount'],
+                              'transactionType': transaction['transactionType'],
+                              'category': transaction['category'],
+                              'description': transaction['description'],
+                            },
+                          );
                         },
                       ),
                       IconButton(
                         icon: Icon(Icons.delete),
                         onPressed: () {
                           // Implement the delete functionality here
-                          // For example, you can show a confirmation dialog and delete the transaction if confirmed
                           showDeleteConfirmationDialog(context, transaction);
                         },
                       ),
                     ],
                   ),
-                  // Implement onTap to navigate to a detailed view if needed
-                  // onTap: () => Navigator.pushNamed(context, '/transaction_details', arguments: transaction),
                 ),
               );
             },
@@ -109,11 +136,15 @@ class TransactionListPage extends StatelessWidget {
   }
 
   void deleteTransaction(Map<String, dynamic> transaction) {
+    print('Deleting transaction with ID: ${transaction['id']}');
     // Implement the delete logic here
-    // For example, you can delete the transaction from Firestore
     FirebaseFirestore.instance
+        .collection('users') // Make sure you're using the correct collection
+        .doc(uid) // Add the user-specific document ID
         .collection('transactions')
         .doc(transaction['id'])
-        .delete();
+        .delete()
+        .then((_) => print('Transaction deleted successfully'))
+        .catchError((error) => print('Error deleting transaction: $error'));
   }
 }

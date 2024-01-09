@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import './firebaseServices.dart';
 
 class BudgetOverviewPage extends StatelessWidget {
   @override
@@ -40,8 +41,18 @@ class BudgetOverviewPage extends StatelessWidget {
   }
 
   Future<Map<String, double>> fetchChartData() async {
-    QuerySnapshot<Map<String, dynamic>> transactions =
-        await FirebaseFirestore.instance.collection('transactions').get();
+    final String? uid = FirebaseAuthService().getCurrentUserUid();
+    if (uid == null || uid.isEmpty) {
+      // If the user is not logged in, return an empty map
+      return {};
+    }
+
+    QuerySnapshot<Map<String, dynamic>> transactions = await FirebaseFirestore
+        .instance
+        .collection('users')
+        .doc(uid)
+        .collection('transactions')
+        .get();
 
     double totalIncome = 0.0;
     double totalExpenses = 0.0;

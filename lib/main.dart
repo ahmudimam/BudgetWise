@@ -7,6 +7,7 @@ import 'splashScreen.dart';
 import 'loginPage.dart';
 import 'signup.dart';
 import 'home.dart';
+import 'edit_transaction_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,6 +41,7 @@ class MyApp extends StatelessWidget {
         '/add_transaction': (context) => AddTransactionPage(),
         '/transaction_list': (context) => TransactionListPage(),
         '/budget_overview': (context) => BudgetOverviewPage(),
+        '/edit_transaction': (context) => EditTransactionPage(),
       },
     );
   }

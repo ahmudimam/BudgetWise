@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import './firebaseServices.dart';
 
 class AddTransactionPage extends StatefulWidget {
   @override
@@ -14,7 +15,6 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
   // Define options for the transaction type dropdown
   final List<String> transactionTypes = ['Expense', 'Income'];
   String selectedTransactionType = 'Expense';
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,22 +76,33 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
   }
 
   void saveTransaction() async {
-    // Extract data from controllers
-    final double amount = double.parse(amountController.text);
-    final String transactionType = selectedTransactionType;
-    final String category = categoryController.text;
-    final String description = descriptionController.text;
-
-    // Reference to the 'transactions' collection
-    final CollectionReference transactions =
-        FirebaseFirestore.instance.collection('transactions');
-
     try {
+      // Extract data from controllers
+      final double amount = double.parse(amountController.text);
+      final String transactionType = selectedTransactionType;
+      final String category = categoryController.text;
+      final String description = descriptionController.text;
+
+      // Use FirebaseAuthService to get the UID of the logged-in user
+      final String? uid = FirebaseAuthService().getCurrentUserUid();
+
+      if (uid == null || uid.isEmpty) {
+        // Handle the case where the user is not logged in
+        print('User not logged in!');
+        return;
+      }
+
+      // Reference to the 'transactions' collection with user-specific subcollection
+      final CollectionReference userTransactions = FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .collection('transactions');
+
       // Generate a unique ID manually
       final String uniqueId = DateTime.now().millisecondsSinceEpoch.toString();
 
       // Add a new document with the unique ID
-      await transactions.doc(uniqueId).set({
+      await userTransactions.doc(uniqueId).set({
         'id': uniqueId,
         'amount': amount,
         'transactionType': transactionType,
