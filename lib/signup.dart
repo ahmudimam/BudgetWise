@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'firebaseServices.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -53,6 +52,7 @@ class _SignUpPageState extends State<SignUpPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Sign Up Page'),
+        backgroundColor: Colors.blue,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -80,14 +80,21 @@ class _SignUpPageState extends State<SignUpPage> {
               onPressed: () {
                 signUpButton();
               },
-              child: Text('Sign Up'),
+              child: Text('Sign Up', style: TextStyle(color: Colors.black)),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.blue, // Background color
+              ),
             ),
             SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
                 signUpWithGoogle();
               },
-              child: Text('Sign Up with Google'),
+              child: Text('Sign Up with Google',
+                  style: TextStyle(color: Colors.black)),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.blue, // Background color
+              ),
             ),
             SizedBox(height: 10),
             Text("Already have an account?",

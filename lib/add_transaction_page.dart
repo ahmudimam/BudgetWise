@@ -20,6 +20,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Add Transaction'),
+        backgroundColor: Colors.blue,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -62,7 +63,11 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
               onPressed: () {
                 saveTransaction();
               },
-              child: Text('Submit Transaction'),
+              child: Text('Submit Transaction',
+                  style: TextStyle(color: Colors.black)),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.blue, // Background color
+              ),
             ),
           ],
         ),
@@ -82,8 +87,12 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
         FirebaseFirestore.instance.collection('transactions');
 
     try {
-      // Add a new document with a generated id
-      await transactions.add({
+      // Generate a unique ID manually
+      final String uniqueId = DateTime.now().millisecondsSinceEpoch.toString();
+
+      // Add a new document with the unique ID
+      await transactions.doc(uniqueId).set({
+        'id': uniqueId,
         'amount': amount,
         'transactionType': transactionType,
         'category': category,

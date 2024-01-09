@@ -8,6 +8,7 @@ class BudgetOverviewPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Budget Overview'),
+        backgroundColor: Colors.blue,
       ),
       body: Center(
         child: FutureBuilder<Map<String, double>>(
