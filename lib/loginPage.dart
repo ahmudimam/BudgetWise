@@ -34,6 +34,7 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(
         title: Text('Login Page'),
         centerTitle: true,
+        backgroundColor: Colors.blue,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -57,7 +58,10 @@ class _LoginPageState extends State<LoginPage> {
               onPressed: () {
                 Loginbutton();
               },
-              child: Text('Login'),
+              child: Text('Login', style: TextStyle(color: Colors.black)),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.blue, // Background color
+              ),
             ),
             SizedBox(
               height: 10,
